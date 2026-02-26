@@ -355,7 +355,7 @@ setup_mosquitto() {
     # Generate password file using mosquitto container
     docker run --rm \
         -v "$INSTALL_DIR/mosquitto/config:/mosquitto/config" \
-        eclipse-mosquitto:2.1.2 \
+        eclipse-mosquitto:2.1.2-alpine \
         mosquitto_passwd -b -c /mosquitto/config/passwd "$MQTT_USER" "$MQTT_PASS"
 
     log_step "MQTT credentials configured ($MQTT_USER/$MQTT_PASS)"
