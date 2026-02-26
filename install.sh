@@ -358,6 +358,9 @@ setup_mosquitto() {
         eclipse-mosquitto:2.1.2-alpine \
         mosquitto_passwd -b -c /mosquitto/config/passwd "$MQTT_USER" "$MQTT_PASS"
 
+    # Set ownership for mosquitto user (UID 1883 in container)
+    chown -R 1883:1883 "$INSTALL_DIR/mosquitto"
+
     log_step "MQTT credentials configured ($MQTT_USER/$MQTT_PASS)"
 }
 
