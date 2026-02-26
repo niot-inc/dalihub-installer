@@ -27,7 +27,6 @@ echo -e "${YELLOW}Uninstaller${NC}"
 echo ""
 echo "This will:"
 echo "  - Stop and remove all DALIHub containers"
-echo "  - Remove systemd service"
 echo "  - Optionally remove data and configuration"
 echo "  - Optionally reset UART settings"
 echo ""
@@ -47,25 +46,16 @@ fi
 echo ""
 
 # Stop containers
-echo -e "${GREEN}[1/5]${NC} Stopping containers..."
+echo -e "${GREEN}[1/4]${NC} Stopping containers..."
 if [ -f "$INSTALL_DIR/docker-compose.yml" ]; then
     cd "$INSTALL_DIR"
-    docker compose --profile auto-update down --remove-orphans 2>/dev/null || true
     docker compose down --remove-orphans 2>/dev/null || true
 fi
 echo "  Done"
 
-# Remove systemd service
-echo -e "${GREEN}[2/5]${NC} Removing systemd service..."
-systemctl stop dalihub.service 2>/dev/null || true
-systemctl disable dalihub.service 2>/dev/null || true
-rm -f /etc/systemd/system/dalihub.service
-systemctl daemon-reload
-echo "  Done"
-
 # Remove data
 echo ""
-echo -e "${GREEN}[3/5]${NC} Data removal options:"
+echo -e "${GREEN}[2/4]${NC} Data removal options:"
 echo "  1) Keep all data (config, logs, etc.)"
 echo "  2) Remove everything except config"
 echo "  3) Remove everything"
@@ -92,11 +82,11 @@ esac
 
 # Remove Docker images (optional)
 echo ""
-read -p "$(echo -e "${GREEN}[4/5]${NC}") Remove Docker images? [y/N] " -n 1 -r
+read -p "$(echo -e "${GREEN}[3/4]${NC}") Remove Docker images? [y/N] " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     docker rmi ghcr.io/niot-inc/dalihub 2>/dev/null || true
-    docker rmi eclipse-mosquitto:2.0.18 2>/dev/null || true
+    docker rmi eclipse-mosquitto:2.1.2-alpine 2>/dev/null || true
     docker rmi containrrr/watchtower 2>/dev/null || true
     echo "  Images removed"
 else
@@ -105,7 +95,7 @@ fi
 
 # Reset UART
 echo ""
-read -p "$(echo -e "${GREEN}[5/5]${NC}") Reset UART settings (re-enable Bluetooth)? [y/N] " -n 1 -r
+read -p "$(echo -e "${GREEN}[4/4]${NC}") Reset UART settings (re-enable Bluetooth)? [y/N] " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     # Find config.txt
