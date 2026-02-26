@@ -3,7 +3,7 @@ services:
   # DALIHub - DALI Lighting Control System
   # ============================================================================
   dalihub:
-    image: ghcr.io/niot-inc/dalihub-installer:latest
+    image: ghcr.io/niot-inc/dalihub:latest
     container_name: dalihub
     restart: unless-stopped
     ports:
