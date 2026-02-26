@@ -375,33 +375,6 @@ start_dalihub() {
     log_step "DALIHub started"
 }
 
-create_systemd_service() {
-    log_info "Creating systemd service..."
-
-    cat > /etc/systemd/system/dalihub.service << EOF
-[Unit]
-Description=DALIHub DALI Lighting Control System
-Requires=docker.service
-After=docker.service
-
-[Service]
-Type=oneshot
-RemainAfterExit=yes
-WorkingDirectory=$INSTALL_DIR
-ExecStart=/usr/bin/docker compose up -d
-ExecStop=/usr/bin/docker compose down
-TimeoutStartSec=0
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-    systemctl daemon-reload
-    systemctl enable dalihub.service
-
-    log_step "Systemd service enabled (auto-start on boot)"
-}
-
 # ============================================================================
 # Completion
 # ============================================================================
@@ -463,7 +436,6 @@ main() {
     download_files
     setup_mosquitto
     start_dalihub
-    create_systemd_service
     print_completion
 }
 
