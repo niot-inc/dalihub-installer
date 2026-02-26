@@ -1,0 +1,20 @@
+# Environment (local testing)
+.env
+
+# Data directories (local testing)
+config/
+data/
+logs/
+mosquitto/data/
+mosquitto/log/
+mosquitto/config/passwd
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo

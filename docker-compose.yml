@@ -1,0 +1,83 @@
+services:
+  # ============================================================================
+  # DALIHub - DALI Lighting Control System
+  # ============================================================================
+  dalihub:
+    image: ghcr.io/niot-inc/dalihub-installer:latest
+    container_name: dalihub
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    devices:
+      - "/dev/ttyAMA0:/dev/ttyAMA0"
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+      - ./logs:/app/logs
+    environment:
+      - NODE_ENV=production
+      - TZ=${TZ}
+      - WATCHTOWER_API_URL=http://watchtower:8080
+      - WATCHTOWER_API_TOKEN=${WATCHTOWER_TOKEN}
+      - GITHUB_RELEASE_REPO=niot-inc/dalihub-installer
+    depends_on:
+      - mosquitto
+      - watchtower
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ============================================================================
+  # Mosquitto - MQTT Broker
+  # ============================================================================
+  mosquitto:
+    image: eclipse-mosquitto:2.1.2
+    container_name: dalihub-mqtt
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto/config:/mosquitto/config:ro
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+    environment:
+      - TZ=${TZ}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+  # ============================================================================
+  # Watchtower - Update Manager
+  # ============================================================================
+  watchtower:
+    image: containrrr/watchtower:1.7.1
+    container_name: dalihub-watchtower
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - TZ=${TZ}
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_LABEL_ENABLE=true
+      - WATCHTOWER_POLL_INTERVAL=0
+      - WATCHTOWER_HTTP_API_UPDATE=true
+      - WATCHTOWER_HTTP_API_TOKEN=${WATCHTOWER_TOKEN}
+      - WATCHTOWER_HTTP_API_PERIODIC_POLLS=true
+    ports:
+      - "127.0.0.1:8080:8080"
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "1"
