@@ -412,7 +412,7 @@ print_completion() {
     if [ "$REBOOT_REQUIRED" = true ]; then
         echo -e "${YELLOW}  ⚠ REBOOT REQUIRED to enable UART for DALI HAT!${NC}"
         echo ""
-        read -p "  Reboot now? [y/N] " -n 1 -r
+        read -p "  Reboot now? [y/N] " -n 1 -r < /dev/tty
         echo
         if [[ $REPLY =~ ^[Yy]$ ]]; then
             log_info "Rebooting..."

@@ -30,7 +30,7 @@ echo "  - Stop and remove all DALIHub containers"
 echo "  - Optionally remove data and configuration"
 echo "  - Optionally reset UART settings"
 echo ""
-read -p "Continue? [y/N] " -n 1 -r
+read -p "Continue? [y/N] " -n 1 -r < /dev/tty
 echo
 if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     echo "Cancelled."
@@ -59,7 +59,7 @@ echo -e "${GREEN}[2/4]${NC} Data removal options:"
 echo "  1) Keep all data (config, logs, etc.)"
 echo "  2) Remove everything except config"
 echo "  3) Remove everything"
-read -p "  Choose [1-3]: " -n 1 -r
+read -p "  Choose [1-3]: " -n 1 -r < /dev/tty
 echo
 
 case $REPLY in
@@ -82,7 +82,7 @@ esac
 
 # Remove Docker images (optional)
 echo ""
-read -p "$(echo -e "${GREEN}[3/4]${NC}") Remove Docker images? [y/N] " -n 1 -r
+read -p "$(echo -e "${GREEN}[3/4]${NC}") Remove Docker images? [y/N] " -n 1 -r < /dev/tty
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     docker rmi ghcr.io/niot-inc/dalihub 2>/dev/null || true
@@ -95,7 +95,7 @@ fi
 
 # Reset UART
 echo ""
-read -p "$(echo -e "${GREEN}[4/4]${NC}") Reset UART settings (re-enable Bluetooth)? [y/N] " -n 1 -r
+read -p "$(echo -e "${GREEN}[4/4]${NC}") Reset UART settings (re-enable Bluetooth)? [y/N] " -n 1 -r < /dev/tty
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     # Find config.txt
@@ -110,7 +110,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
         # Look for backup
         LATEST_BACKUP=$(ls -t "${CFG_FILE}.backup."* 2>/dev/null | head -1 || true)
         if [ -n "$LATEST_BACKUP" ]; then
-            read -p "  Restore from backup ($LATEST_BACKUP)? [y/N] " -n 1 -r
+            read -p "  Restore from backup ($LATEST_BACKUP)? [y/N] " -n 1 -r < /dev/tty
             echo
             if [[ $REPLY =~ ^[Yy]$ ]]; then
                 cp "$LATEST_BACKUP" "$CFG_FILE"
