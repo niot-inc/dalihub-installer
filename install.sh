@@ -236,14 +236,19 @@ setup_uart() {
         echo "enable_uart=1" >> "$CFG_FILE"
     fi
 
-    # Disable Bluetooth (to free up UART)
-    if ! grep -q "^dtoverlay=disable-bt" "$CFG_FILE"; then
-        echo "dtoverlay=disable-bt" >> "$CFG_FILE"
-    fi
+    # Detect Pi 5 (Bluetooth is on RP1 chip, no hciuart needed)
+    PI_MODEL=$(tr -d '\0' < /proc/device-tree/model 2>/dev/null)
+    IS_PI5=false
+    [[ "$PI_MODEL" == *"Raspberry Pi 5"* ]] && IS_PI5=true
 
-    # Disable Bluetooth services
-    systemctl stop hciuart 2>/dev/null || true
-    systemctl disable hciuart 2>/dev/null || true
+    # Disable Bluetooth (to free up UART)
+    if [ "$IS_PI5" != true ]; then
+        if ! grep -q "^dtoverlay=disable-bt" "$CFG_FILE"; then
+            echo "dtoverlay=disable-bt" >> "$CFG_FILE"
+        fi
+        systemctl stop hciuart 2>/dev/null || true
+        systemctl disable hciuart 2>/dev/null || true
+    fi
     systemctl stop bluetooth 2>/dev/null || true
     systemctl disable bluetooth 2>/dev/null || true
 

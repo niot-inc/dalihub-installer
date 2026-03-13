@@ -123,8 +123,11 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
         fi
     fi
 
-    # Re-enable services
-    systemctl enable hciuart 2>/dev/null || true
+    # Re-enable services (hciuart only exists on Pi 4 and earlier)
+    PI_MODEL=$(tr -d '\0' < /proc/device-tree/model 2>/dev/null)
+    if [[ "$PI_MODEL" != *"Raspberry Pi 5"* ]]; then
+        systemctl enable hciuart 2>/dev/null || true
+    fi
     systemctl enable bluetooth 2>/dev/null || true
     systemctl enable serial-getty@ttyAMA0.service 2>/dev/null || true
 
