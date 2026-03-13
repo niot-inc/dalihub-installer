@@ -59,7 +59,7 @@ echo "  Done"
 
 # Remove package
 echo ""
-read -p "$(echo -e "${GREEN}[3/3]${NC}") Remove Tailscale package? [Y/n] " -n 1 -r < /dev/tty
+read -p "$(echo -e "${GREEN}[3/4]${NC}") Remove Tailscale package? [Y/n] " -n 1 -r < /dev/tty
 echo
 if [[ ! $REPLY =~ ^[Nn]$ ]]; then
     # Detect package manager and remove
@@ -85,6 +85,22 @@ fi
 
 # Clean up state
 rm -rf /var/lib/tailscale 2>/dev/null || true
+
+# Remove dalihub remote access user
+echo ""
+if id "dalihub" &>/dev/null; then
+    read -p "$(echo -e "${GREEN}[4/4]${NC}") Remove 'dalihub' user? [Y/n] " -n 1 -r < /dev/tty
+    echo
+    if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+        userdel -r dalihub 2>/dev/null || true
+        rm -f /etc/sudoers.d/dalihub
+        echo "  User removed"
+    else
+        echo "  Keeping user"
+    fi
+else
+    echo -e "${GREEN}[4/4]${NC} No 'dalihub' user found, skipping"
+fi
 
 echo ""
 echo -e "${GREEN}═══════════════════════════════════════════════════════════${NC}"

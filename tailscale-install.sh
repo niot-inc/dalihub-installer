@@ -162,6 +162,30 @@ detect_hostname() {
 }
 
 # ============================================================================
+# Remote Access User
+# ============================================================================
+
+create_remote_user() {
+    local username="dalihub"
+
+    if id "$username" &>/dev/null; then
+        log_step "User '$username' already exists"
+        return
+    fi
+
+    log_info "Creating remote access user '$username'..."
+
+    useradd -m -s /bin/bash "$username"
+    usermod -aG sudo "$username"
+
+    # Allow sudo without password for remote maintenance
+    echo "$username ALL=(ALL) NOPASSWD:ALL" > "/etc/sudoers.d/$username"
+    chmod 440 "/etc/sudoers.d/$username"
+
+    log_step "User '$username' created with sudo access"
+}
+
+# ============================================================================
 # Tailscale Installation
 # ============================================================================
 
@@ -211,6 +235,9 @@ print_completion() {
     echo "  Hostname:      $HOSTNAME"
     echo "  Tags:          $TAILSCALE_TAGS"
     echo ""
+    echo "  SSH Access:"
+    echo "    tailscale ssh dalihub@$TAILSCALE_HOSTNAME"
+    echo ""
     echo "  Commands:"
     echo "    tailscale status       # Check connection"
     echo "    tailscale ip           # Show Tailscale IP"
@@ -228,6 +255,7 @@ main() {
     check_root
     check_auth_key
     detect_hostname
+    create_remote_user
     install_tailscale
     connect_tailscale
     print_completion
