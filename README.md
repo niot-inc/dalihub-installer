@@ -113,6 +113,26 @@ docker compose down
 docker compose up -d
 ```
 
+## Remote Access (Tailscale)
+
+You can install Tailscale on customer devices for remote access.
+
+### Install Tailscale
+
+```bash
+curl -sSL https://raw.githubusercontent.com/niot-inc/dalihub-installer/main/tailscale-install.sh | sudo bash -s -- --auth-key 'tskey-auth-xxxxx'
+```
+
+- Get an auth key from the [Tailscale Admin Console](https://login.tailscale.com/admin/settings/keys)
+- The device will automatically join the network with the `tag:dalihub` tag
+- The `--tags` option can be used to specify custom ACL tags
+
+### Uninstall Tailscale
+
+```bash
+curl -sSL https://raw.githubusercontent.com/niot-inc/dalihub-installer/main/tailscale-uninstall.sh | sudo bash
+```
+
 ## Uninstall
 
 ```bash

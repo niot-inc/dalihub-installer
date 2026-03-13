@@ -113,6 +113,26 @@ docker compose down
 docker compose up -d
 ```
 
+## 원격 접속 (Tailscale)
+
+고객 장치에 Tailscale을 설치하여 원격 접속할 수 있습니다.
+
+### Tailscale 설치
+
+```bash
+curl -sSL https://raw.githubusercontent.com/niot-inc/dalihub-installer/main/tailscale-install.sh | sudo bash -s -- --auth-key 'tskey-auth-xxxxx'
+```
+
+- [Tailscale 관리 콘솔](https://login.tailscale.com/admin/settings/keys)에서 auth key를 발급받으세요
+- 장치가 `tag:dalihub` 태그로 자동으로 네트워크에 참여합니다
+- `--tags` 옵션으로 커스텀 ACL 태그를 지정할 수 있습니다
+
+### Tailscale 제거
+
+```bash
+curl -sSL https://raw.githubusercontent.com/niot-inc/dalihub-installer/main/tailscale-uninstall.sh | sudo bash
+```
+
 ## 제거
 
 ```bash
