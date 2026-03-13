@@ -187,7 +187,8 @@ connect_tailscale() {
     tailscale up \
         --auth-key="${AUTH_KEY}?ephemeral=false&preauthorized=true" \
         --advertise-tags="${TAILSCALE_TAGS}" \
-        --hostname="${TAILSCALE_HOSTNAME}"
+        --hostname="${TAILSCALE_HOSTNAME}" \
+        --ssh
 
     log_step "Connected to Tailscale network"
 }
