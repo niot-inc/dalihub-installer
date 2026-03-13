@@ -9,7 +9,7 @@ services:
     ports:
       - "3000:3000"
     devices:
-      - "/dev/ttyAMA0:/dev/ttyAMA0"
+      - "/dev/serial0:/dev/serial0"
     volumes:
       - ./config:/app/config
       - ./data:/app/data
