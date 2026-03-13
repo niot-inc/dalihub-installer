@@ -16,6 +16,35 @@ curl -sSL https://raw.githubusercontent.com/niot-inc/dalihub-installer/main/inst
 - **OS**: Raspberry Pi OS (64-bit recommended), Debian 11+, Ubuntu 22.04+
 - **Network**: Internet connection (during installation)
 
+## HAT Installation Order (Important)
+
+The DALI HAT must be installed in the correct order. If the Pi boots with the HAT attached but UART is not yet enabled (e.g., fresh OS install), the HAT's co-processor may enter a bad state (white LED stays solid instead of blinking). This state may not recover with a simple reboot — the HAT must be physically removed and reattached.
+
+### Correct Setup Procedure
+
+1. Boot the Pi **without** the HAT attached
+2. Run the installer to configure UART and install DALIHub
+3. **Power off** the Pi completely
+4. Attach the DALI HAT to the Pi
+5. Power on — the white LED should blink, indicating normal operation
+
+### If the HAT is Unresponsive
+
+If the white LED stays solid (not blinking) and serial communication fails:
+
+1. **Power off** the Pi
+2. **Remove** the HAT from the Pi
+3. Wait a few seconds, then **reattach** the HAT
+4. **Power on** the Pi
+5. Verify serial communication:
+   ```bash
+   python3 -c "import serial; s = serial.Serial('/dev/serial0', 19200, timeout=3); s.write(b'v\n'); print(s.readline()); s.close()"
+   ```
+   - **OK**: `b'V011404\n'` (version response received)
+   - **NG**: `b''` (empty response — HAT is not communicating, repeat steps 1-4)
+
+> **Note**: The DALI line can remain connected to the HAT during removal/reattachment. The HAT performs an automatic power detection sequence 6 seconds after boot — this requires the UART pins to be properly initialized.
+
 ## Components
 
 | Service | Port | Description |

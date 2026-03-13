@@ -16,6 +16,35 @@ curl -sSL https://raw.githubusercontent.com/niot-inc/dalihub-installer/main/inst
 - **OS**: Raspberry Pi OS (64-bit 권장), Debian 11+, Ubuntu 22.04+
 - **네트워크**: 인터넷 연결 (설치 시)
 
+## HAT 설치 순서 (중요)
+
+DALI HAT은 반드시 올바른 순서로 설치해야 합니다. UART가 활성화되지 않은 상태(예: OS 새로 설치 직후)에서 HAT이 장착된 채 Pi를 부팅하면, HAT의 co-processor가 비정상 상태에 진입할 수 있습니다 (흰색 LED가 깜빡이지 않고 계속 켜져있음). 이 상태는 단순 재부팅으로 복구되지 않을 수 있으며, HAT을 물리적으로 분리 후 재장착해야 합니다.
+
+### 올바른 설치 순서
+
+1. HAT을 **장착하지 않은 상태**에서 Pi 부팅
+2. 설치 스크립트를 실행하여 UART 설정 및 DALIHub 설치
+3. Pi **전원 완전히 끄기**
+4. DALI HAT을 Pi에 장착
+5. 전원 켜기 — 흰색 LED가 깜빡이면 정상 동작
+
+### HAT이 응답하지 않는 경우
+
+흰색 LED가 깜빡이지 않고 계속 켜져있고, 시리얼 통신이 되지 않는 경우:
+
+1. Pi **전원 끄기**
+2. HAT을 Pi에서 **분리**
+3. 몇 초 후 HAT을 다시 **장착**
+4. Pi **전원 켜기**
+5. 시리얼 통신 확인:
+   ```bash
+   python3 -c "import serial; s = serial.Serial('/dev/serial0', 19200, timeout=3); s.write(b'v\n'); print(s.readline()); s.close()"
+   ```
+   - **정상**: `b'V011404\n'` (버전 응답 수신)
+   - **비정상**: `b''` (빈 응답 — HAT이 통신하지 않는 상태, 1-4단계 반복)
+
+> **참고**: HAT 분리/재장착 시 DALI 라인은 연결된 채로 두어도 됩니다. HAT은 부팅 후 6초 뒤에 자동 전원 감지를 수행하는데, 이 과정에서 UART 핀이 정상적으로 초기화되어 있어야 합니다.
+
 ## 구성요소
 
 | 서비스 | 포트 | 설명 |
