@@ -179,13 +179,80 @@ sudo bash /opt/dalihub/uninstall.sh
 
 1. UART 설정 확인:
    ```bash
-   ls -la /dev/ttyAMA0
+   ls -la /dev/serial0
    ```
 
 2. 재부팅 필요할 수 있음:
    ```bash
    sudo reboot
    ```
+
+### UART 루프백 테스트
+
+GPIO 14 (TX)와 GPIO 15 (RX)를 점퍼 와이어로 연결하면 UART가 정상 동작하는지 확인할 수 있습니다.
+
+![Raspberry Pi GPIO 핀맵](assets/pinmap.png)
+
+1. Pi **전원을 끄고** GPIO 14 (TX)와 GPIO 15 (RX)를 점퍼 와이어로 연결
+2. 전원을 켜고 테스트 실행:
+   ```bash
+   python3 -c "
+   import serial
+   s = serial.Serial('/dev/serial0', 19200, timeout=2)
+   print('Port opened:', s.name)
+   s.write(b'hello')
+   data = s.read(5)
+   print('Received:', data)
+   s.close()
+   "
+   ```
+   - **정상**: `Received: b'hello'` (데이터가 루프백으로 수신됨)
+   - **비정상**: `Received: b''` (UART 설정 오류, config.txt에서 `enable_uart=1` 확인)
+
+3. DALI HAT 장착 전에 **점퍼 와이어를 반드시 제거**
+
+### DALI 조명 테스트
+
+먼저 DALIHub을 중지하여 시리얼 포트를 해제한 후 직접 테스트:
+
+```bash
+docker stop dalihub
+```
+
+**전체 조명 끄기** (broadcast):
+```bash
+python3 -c "
+import serial, time
+s = serial.Serial('/dev/serial0', 19200, timeout=3)
+s.write(b'hFE00\n')
+time.sleep(0.5)
+while True:
+    line = s.readline()
+    if not line: break
+    print('RX:', line)
+s.close()
+"
+```
+
+**전체 조명 켜기** (broadcast):
+```bash
+python3 -c "
+import serial, time
+s = serial.Serial('/dev/serial0', 19200, timeout=3)
+s.write(b'hFEFE\n')
+time.sleep(0.5)
+while True:
+    line = s.readline()
+    if not line: break
+    print('RX:', line)
+s.close()
+"
+```
+
+테스트 후 DALIHub 다시 시작:
+```bash
+docker start dalihub
+```
 
 ### MQTT 연결 실패
 

@@ -179,13 +179,80 @@ sudo bash /opt/dalihub/uninstall.sh
 
 1. Check UART settings:
    ```bash
-   ls -la /dev/ttyAMA0
+   ls -la /dev/serial0
    ```
 
 2. A reboot may be required:
    ```bash
    sudo reboot
    ```
+
+### UART Loopback Test
+
+You can verify UART is working correctly by connecting GPIO 14 (TX) and GPIO 15 (RX) together with a jumper wire, then running a loopback test.
+
+![Raspberry Pi GPIO Pinmap](assets/pinmap.png)
+
+1. **Power off** the Pi and connect GPIO 14 (TX) to GPIO 15 (RX) with a jumper wire
+2. Power on and run the test:
+   ```bash
+   python3 -c "
+   import serial
+   s = serial.Serial('/dev/serial0', 19200, timeout=2)
+   print('Port opened:', s.name)
+   s.write(b'hello')
+   data = s.read(5)
+   print('Received:', data)
+   s.close()
+   "
+   ```
+   - **OK**: `Received: b'hello'` (data looped back successfully)
+   - **NG**: `Received: b''` (UART is not configured correctly, check `enable_uart=1` in config.txt)
+
+3. **Remove the jumper wire** before attaching the DALI HAT
+
+### DALI Lighting Test
+
+Stop DALIHub first to free the serial port, then test directly:
+
+```bash
+docker stop dalihub
+```
+
+**All lights OFF** (broadcast):
+```bash
+python3 -c "
+import serial, time
+s = serial.Serial('/dev/serial0', 19200, timeout=3)
+s.write(b'hFE00\n')
+time.sleep(0.5)
+while True:
+    line = s.readline()
+    if not line: break
+    print('RX:', line)
+s.close()
+"
+```
+
+**All lights ON** (broadcast):
+```bash
+python3 -c "
+import serial, time
+s = serial.Serial('/dev/serial0', 19200, timeout=3)
+s.write(b'hFEFE\n')
+time.sleep(0.5)
+while True:
+    line = s.readline()
+    if not line: break
+    print('RX:', line)
+s.close()
+"
+```
+
+Start DALIHub again after testing:
+```bash
+docker start dalihub
+```
 
 ### MQTT Connection Failed
 
