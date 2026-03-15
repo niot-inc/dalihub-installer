@@ -67,6 +67,16 @@ sudo bash install.sh --skip-uart
 sudo bash install.sh --install-dir /home/pi/dalihub
 ```
 
+curl 원라이너에서 옵션을 전달하려면 `bash -s --`를 사용합니다:
+
+```bash
+# UART 설정 건너뛰기
+curl -sSL https://raw.githubusercontent.com/niot-inc/dalihub-installer/main/install.sh | sudo bash -s -- --skip-uart
+
+# 설치 경로 지정
+curl -sSL https://raw.githubusercontent.com/niot-inc/dalihub-installer/main/install.sh | sudo bash -s -- --install-dir /home/pi/dalihub
+```
+
 ## 설치 후 접속
 
 - **Web UI**: `http://<라즈베리파이-IP>:3000`

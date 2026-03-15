@@ -67,6 +67,16 @@ sudo bash install.sh --skip-uart
 sudo bash install.sh --install-dir /home/pi/dalihub
 ```
 
+When using curl one-liner with options, use `bash -s --`:
+
+```bash
+# Skip UART setup
+curl -sSL https://raw.githubusercontent.com/niot-inc/dalihub-installer/main/install.sh | sudo bash -s -- --skip-uart
+
+# Custom installation path
+curl -sSL https://raw.githubusercontent.com/niot-inc/dalihub-installer/main/install.sh | sudo bash -s -- --install-dir /home/pi/dalihub
+```
+
 ## Access After Installation
 
 - **Web UI**: `http://<raspberry-pi-IP>:3000`
