@@ -229,28 +229,32 @@ setup_uart() {
     # Backup config.txt
     cp "$CFG_FILE" "${CFG_FILE}.backup.$(date +%Y%m%d-%H%M%S)"
 
-    # Enable UART
-    if grep -q "^enable_uart" "$CFG_FILE"; then
-        sed -i 's/^enable_uart=.*/enable_uart=1/' "$CFG_FILE"
-    else
-        echo "enable_uart=1" >> "$CFG_FILE"
-    fi
-
-    # Detect Pi 5 (Bluetooth is on RP1 chip, no hciuart needed)
+    # Detect Pi model
     PI_MODEL=$(tr -d '\0' < /proc/device-tree/model 2>/dev/null)
     IS_PI5=false
     [[ "$PI_MODEL" == *"Raspberry Pi 5"* ]] && IS_PI5=true
 
-    # Disable Bluetooth (to free up UART)
-    if [ "$IS_PI5" != true ]; then
+    # Enable UART and disable Bluetooth
+    if [ "$IS_PI5" = true ]; then
+        # Pi 5: dtparam=uart0=on enables UART0 on GPIO 14/15
+        if ! grep -q "dtparam=uart0=on" "$CFG_FILE"; then
+            echo "dtparam=uart0=on" >> "$CFG_FILE"
+        fi
+    else
+        # Pi 4 and earlier: enable_uart=1 + disable-bt to free UART from Bluetooth
+        if grep -q "^enable_uart" "$CFG_FILE"; then
+            sed -i 's/^enable_uart=.*/enable_uart=1/' "$CFG_FILE"
+        else
+            echo "enable_uart=1" >> "$CFG_FILE"
+        fi
         if ! grep -q "^dtoverlay=disable-bt" "$CFG_FILE"; then
             echo "dtoverlay=disable-bt" >> "$CFG_FILE"
         fi
         systemctl stop hciuart 2>/dev/null || true
         systemctl disable hciuart 2>/dev/null || true
+        systemctl stop bluetooth 2>/dev/null || true
+        systemctl disable bluetooth 2>/dev/null || true
     fi
-    systemctl stop bluetooth 2>/dev/null || true
-    systemctl disable bluetooth 2>/dev/null || true
 
     # Disable serial console getty
     systemctl stop serial-getty@ttyAMA0.service 2>/dev/null || true

@@ -16,6 +16,12 @@ curl -sSL https://raw.githubusercontent.com/niot-inc/dalihub-installer/main/inst
 - **OS**: Raspberry Pi OS (64-bit recommended), Debian 11+, Ubuntu 22.04+
 - **Network**: Internet connection (during installation)
 
+> **WARNING: Use the correct power supply!** Many issues (random reboots, serial communication failures, HAT malfunction) are caused by insufficient power.
+> - **Raspberry Pi 4**: 5.1V / 3A (USB-C) — official power supply recommended
+> - **Raspberry Pi 5**: 5.1V / 5A (USB-C) — **27W official power supply required**
+>
+> Using a phone charger or underpowered adapter is the #1 cause of unstable operation.
+
 ## HAT Installation Order (Important)
 
 The DALI HAT must be installed in the correct order. If the Pi boots with the HAT attached but UART is not yet enabled (e.g., fresh OS install), the HAT's co-processor may enter a bad state (white LED stays solid instead of blinking). This state may not recover with a simple reboot — the HAT must be physically removed and reattached.
@@ -38,7 +44,7 @@ If the white LED stays solid (not blinking) and serial communication fails:
 4. **Power on** the Pi
 5. Verify serial communication:
    ```bash
-   python3 -c "import serial; s = serial.Serial('/dev/serial0', 19200, timeout=3); s.write(b'v\n'); print(s.readline()); s.close()"
+   python3 -c "import serial; s = serial.Serial('/dev/ttyAMA0', 19200, timeout=3); s.write(b'v\n'); print(s.readline()); s.close()"
    ```
    - **OK**: `b'V011404\n'` (version response received)
    - **NG**: `b''` (empty response — HAT is not communicating, repeat steps 1-4)
@@ -183,13 +189,27 @@ Or:
 sudo bash /opt/dalihub/uninstall.sh
 ```
 
+## UART Configuration by Pi Model
+
+The installer automatically applies the correct settings based on the detected Pi model.
+
+| | Pi 4 and earlier | Pi 5 |
+|---|---|---|
+| **config.txt** | `enable_uart=1` | `dtparam=uart0=on` |
+| | `dtoverlay=disable-bt` | (not needed) |
+| **Services stopped** | `hciuart` | (not needed) |
+| | `bluetooth` | (not needed) |
+| | `serial-getty@ttyAMA0` | `serial-getty@ttyAMA0` |
+| | `serial-getty@ttyS0` | `serial-getty@ttyS0` |
+| **cmdline.txt** | Remove `console=` serial entries | Remove `console=` serial entries |
+
 ## Troubleshooting
 
 ### Serial Port Not Connected
 
 1. Check UART settings:
    ```bash
-   ls -la /dev/serial0
+   ls -la /dev/ttyAMA0
    ```
 
 2. A reboot may be required:
@@ -208,7 +228,7 @@ You can verify UART is working correctly by connecting GPIO 14 (TX) and GPIO 15 
    ```bash
    python3 -c "
    import serial
-   s = serial.Serial('/dev/serial0', 19200, timeout=2)
+   s = serial.Serial('/dev/ttyAMA0', 19200, timeout=2)
    print('Port opened:', s.name)
    s.write(b'hello')
    data = s.read(5)
@@ -233,7 +253,7 @@ docker stop dalihub
 ```bash
 python3 -c "
 import serial, time
-s = serial.Serial('/dev/serial0', 19200, timeout=3)
+s = serial.Serial('/dev/ttyAMA0', 19200, timeout=3)
 s.write(b'hFE00\n')
 time.sleep(0.5)
 while True:
@@ -248,7 +268,7 @@ s.close()
 ```bash
 python3 -c "
 import serial, time
-s = serial.Serial('/dev/serial0', 19200, timeout=3)
+s = serial.Serial('/dev/ttyAMA0', 19200, timeout=3)
 s.write(b'hFEFE\n')
 time.sleep(0.5)
 while True:

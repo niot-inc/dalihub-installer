@@ -119,6 +119,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
         else
             sed -i '/^enable_uart=1$/d' "$CFG_FILE" 2>/dev/null || true
             sed -i '/^dtoverlay=disable-bt$/d' "$CFG_FILE" 2>/dev/null || true
+            sed -i '/^dtparam=uart0=on$/d' "$CFG_FILE" 2>/dev/null || true
             echo "  Removed UART settings"
         fi
     fi

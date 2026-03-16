@@ -16,6 +16,12 @@ curl -sSL https://raw.githubusercontent.com/niot-inc/dalihub-installer/main/inst
 - **OS**: Raspberry Pi OS (64-bit 권장), Debian 11+, Ubuntu 22.04+
 - **네트워크**: 인터넷 연결 (설치 시)
 
+> **경고: 반드시 정격 전원 어댑터를 사용하세요!** 전원 공급 불량은 무작위 재부팅, 시리얼 통신 실패, HAT 오작동 등 대부분의 문제의 원인입니다.
+> - **Raspberry Pi 4**: 5.1V / 3A (USB-C) — 공식 전원 어댑터 권장
+> - **Raspberry Pi 5**: 5.1V / 5A (USB-C) — **27W 공식 전원 어댑터 필수**
+>
+> 핸드폰 충전기나 저전력 어댑터 사용은 불안정 동작의 가장 큰 원인입니다.
+
 ## HAT 설치 순서 (중요)
 
 DALI HAT은 반드시 올바른 순서로 설치해야 합니다. UART가 활성화되지 않은 상태(예: OS 새로 설치 직후)에서 HAT이 장착된 채 Pi를 부팅하면, HAT의 co-processor가 비정상 상태에 진입할 수 있습니다 (흰색 LED가 깜빡이지 않고 계속 켜져있음). 이 상태는 단순 재부팅으로 복구되지 않을 수 있으며, HAT을 물리적으로 분리 후 재장착해야 합니다.
@@ -38,7 +44,7 @@ DALI HAT은 반드시 올바른 순서로 설치해야 합니다. UART가 활성
 4. Pi **전원 켜기**
 5. 시리얼 통신 확인:
    ```bash
-   python3 -c "import serial; s = serial.Serial('/dev/serial0', 19200, timeout=3); s.write(b'v\n'); print(s.readline()); s.close()"
+   python3 -c "import serial; s = serial.Serial('/dev/ttyAMA0', 19200, timeout=3); s.write(b'v\n'); print(s.readline()); s.close()"
    ```
    - **정상**: `b'V011404\n'` (버전 응답 수신)
    - **비정상**: `b''` (빈 응답 — HAT이 통신하지 않는 상태, 1-4단계 반복)
@@ -183,13 +189,27 @@ curl -sSL https://raw.githubusercontent.com/niot-inc/dalihub-installer/main/unin
 sudo bash /opt/dalihub/uninstall.sh
 ```
 
+## Pi 모델별 UART 설정
+
+설치 스크립트가 Pi 모델을 감지하여 자동으로 올바른 설정을 적용합니다.
+
+| | Pi 4 이하 | Pi 5 |
+|---|---|---|
+| **config.txt** | `enable_uart=1` | `dtparam=uart0=on` |
+| | `dtoverlay=disable-bt` | (불필요) |
+| **서비스 중지** | `hciuart` | (불필요) |
+| | `bluetooth` | (불필요) |
+| | `serial-getty@ttyAMA0` | `serial-getty@ttyAMA0` |
+| | `serial-getty@ttyS0` | `serial-getty@ttyS0` |
+| **cmdline.txt** | `console=` 시리얼 항목 제거 | `console=` 시리얼 항목 제거 |
+
 ## 문제 해결
 
 ### 시리얼 포트 연결 안됨
 
 1. UART 설정 확인:
    ```bash
-   ls -la /dev/serial0
+   ls -la /dev/ttyAMA0
    ```
 
 2. 재부팅 필요할 수 있음:
@@ -208,7 +228,7 @@ GPIO 14 (TX)와 GPIO 15 (RX)를 점퍼 와이어로 연결하면 UART가 정상 
    ```bash
    python3 -c "
    import serial
-   s = serial.Serial('/dev/serial0', 19200, timeout=2)
+   s = serial.Serial('/dev/ttyAMA0', 19200, timeout=2)
    print('Port opened:', s.name)
    s.write(b'hello')
    data = s.read(5)
@@ -233,7 +253,7 @@ docker stop dalihub
 ```bash
 python3 -c "
 import serial, time
-s = serial.Serial('/dev/serial0', 19200, timeout=3)
+s = serial.Serial('/dev/ttyAMA0', 19200, timeout=3)
 s.write(b'hFE00\n')
 time.sleep(0.5)
 while True:
@@ -248,7 +268,7 @@ s.close()
 ```bash
 python3 -c "
 import serial, time
-s = serial.Serial('/dev/serial0', 19200, timeout=3)
+s = serial.Serial('/dev/ttyAMA0', 19200, timeout=3)
 s.write(b'hFEFE\n')
 time.sleep(0.5)
 while True:
