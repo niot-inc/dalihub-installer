@@ -51,6 +51,12 @@ if [ -f "$INSTALL_DIR/docker-compose.yml" ]; then
     cd "$INSTALL_DIR"
     docker compose down --remove-orphans 2>/dev/null || true
 fi
+# Remove first-boot service if it exists
+if [ -f /etc/systemd/system/dalihub-first-boot.service ]; then
+    systemctl disable dalihub-first-boot.service 2>/dev/null || true
+    rm -f /etc/systemd/system/dalihub-first-boot.service
+    systemctl daemon-reload
+fi
 echo "  Done"
 
 # Remove data

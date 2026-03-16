@@ -373,6 +373,27 @@ setup_mosquitto() {
     log_step "MQTT credentials configured ($MQTT_USER/$MQTT_PASS)"
 }
 
+create_first_boot_service() {
+    cat > /etc/systemd/system/dalihub-first-boot.service <<EOF
+[Unit]
+Description=DALIHub first boot startup
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=$INSTALL_DIR
+ExecStart=/usr/bin/docker compose up -d
+ExecStartPost=/bin/rm /etc/systemd/system/dalihub-first-boot.service
+ExecStartPost=/usr/bin/systemctl daemon-reload
+
+[Install]
+WantedBy=multi-user.target
+EOF
+    systemctl daemon-reload
+    systemctl enable dalihub-first-boot.service
+}
+
 start_dalihub() {
     log_info "Starting DALIHub..."
 
@@ -381,10 +402,17 @@ start_dalihub() {
     # Pull images
     docker compose pull
 
-    # Start all services
-    docker compose up -d
-
-    log_step "DALIHub started"
+    if [ "$REBOOT_REQUIRED" = true ]; then
+        # UART not active yet — start services that don't need serial
+        docker compose up -d mosquitto watchtower
+        # Register one-shot service to start everything after reboot
+        create_first_boot_service
+        log_step "DALIHub images pulled (full startup after reboot)"
+    else
+        # UART already active — start all services
+        docker compose up -d
+        log_step "DALIHub started"
+    fi
 }
 
 # ============================================================================
