@@ -143,6 +143,26 @@ detect_platform() {
         if [[ "$MODEL" == *"Raspberry Pi"* ]]; then
             IS_RASPBERRY_PI=true
             log_step "Hardware: $MODEL"
+
+            # Pi 5 compatibility warning
+            if [[ "$MODEL" == *"Raspberry Pi 5"* ]]; then
+                echo ""
+                echo -e "${RED}═══════════════════════════════════════════════════════════${NC}"
+                echo -e "${RED}  WARNING: Raspberry Pi 5 is NOT supported!${NC}"
+                echo -e "${RED}═══════════════════════════════════════════════════════════${NC}"
+                echo ""
+                echo "  The DALI HAT has hardware compatibility issues with Pi 5."
+                echo "  The HAT freezes when attached, even with correct UART setup."
+                echo "  Please use Raspberry Pi 4 instead."
+                echo ""
+                read -p "  Continue anyway? [y/N] " -n 1 -r < /dev/tty
+                echo
+                if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                    echo "Installation cancelled."
+                    exit 1
+                fi
+                log_warn "Continuing on unsupported Pi 5 at user's request"
+            fi
         fi
     fi
 

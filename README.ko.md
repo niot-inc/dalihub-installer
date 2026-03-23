@@ -12,13 +12,14 @@ curl -sSL https://raw.githubusercontent.com/niot-inc/dalihub-installer/main/inst
 
 ## 요구사항
 
-- **하드웨어**: Raspberry Pi 4/5 + DALI HAT
+- **하드웨어**: Raspberry Pi 4 + DALI HAT
 - **OS**: Raspberry Pi OS (64-bit 권장), Debian 11+, Ubuntu 22.04+
 - **네트워크**: 인터넷 연결 (설치 시)
 
+> **경고: Raspberry Pi 5는 지원하지 않습니다.** DALI HAT을 Pi 5에 장착하면 하드웨어 호환성 문제로 HAT이 프리징됩니다. UART 설정이 올바르고 루프백 테스트를 통과하더라도 HAT 장착 시 응답 불가 상태가 됩니다. **반드시 Raspberry Pi 4를 사용하세요.**
+
 > **경고: 반드시 정격 전원 어댑터를 사용하세요!** 전원 공급 불량은 무작위 재부팅, 시리얼 통신 실패, HAT 오작동 등 대부분의 문제의 원인입니다.
 > - **Raspberry Pi 4**: 5.1V / 3A (USB-C) — 공식 전원 어댑터 권장
-> - **Raspberry Pi 5**: 5.1V / 5A (USB-C) — **27W 공식 전원 어댑터 필수**
 >
 > 핸드폰 충전기나 저전력 어댑터 사용은 불안정 동작의 가장 큰 원인입니다.
 
@@ -189,19 +190,17 @@ curl -sSL https://raw.githubusercontent.com/niot-inc/dalihub-installer/main/unin
 sudo bash /opt/dalihub/uninstall.sh
 ```
 
-## Pi 모델별 UART 설정
+## UART 설정
 
-설치 스크립트가 Pi 모델을 감지하여 자동으로 올바른 설정을 적용합니다.
+설치 스크립트가 자동으로 다음 설정을 적용합니다.
 
-| | Pi 4 이하 | Pi 5 |
-|---|---|---|
-| **config.txt** | `enable_uart=1` | `dtparam=uart0=on` |
-| | `dtoverlay=disable-bt` | (불필요) |
-| **서비스 중지** | `hciuart` | (불필요) |
-| | `bluetooth` | (불필요) |
-| | `serial-getty@ttyAMA0` | `serial-getty@ttyAMA0` |
-| | `serial-getty@ttyS0` | `serial-getty@ttyS0` |
-| **cmdline.txt** | `console=` 시리얼 항목 제거 | `console=` 시리얼 항목 제거 |
+| 설정 | 값 |
+|---|---|
+| **config.txt** | `enable_uart=1` |
+| | `dtoverlay=disable-bt` |
+| **서비스 중지** | `hciuart`, `bluetooth` |
+| | `serial-getty@ttyAMA0`, `serial-getty@ttyS0` |
+| **cmdline.txt** | `console=` 시리얼 항목 제거 |
 
 ## 문제 해결
 

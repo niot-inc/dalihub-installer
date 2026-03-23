@@ -12,13 +12,14 @@ curl -sSL https://raw.githubusercontent.com/niot-inc/dalihub-installer/main/inst
 
 ## Requirements
 
-- **Hardware**: Raspberry Pi 4/5 + DALI HAT
+- **Hardware**: Raspberry Pi 4 + DALI HAT
 - **OS**: Raspberry Pi OS (64-bit recommended), Debian 11+, Ubuntu 22.04+
 - **Network**: Internet connection (during installation)
 
+> **WARNING: Raspberry Pi 5 is NOT supported.** The DALI HAT freezes when attached to a Pi 5 due to hardware compatibility issues. Even when UART is correctly configured and loopback tests pass, the HAT becomes unresponsive upon attachment. **Use Raspberry Pi 4.**
+
 > **WARNING: Use the correct power supply!** Many issues (random reboots, serial communication failures, HAT malfunction) are caused by insufficient power.
 > - **Raspberry Pi 4**: 5.1V / 3A (USB-C) — official power supply recommended
-> - **Raspberry Pi 5**: 5.1V / 5A (USB-C) — **27W official power supply required**
 >
 > Using a phone charger or underpowered adapter is the #1 cause of unstable operation.
 
@@ -189,19 +190,17 @@ Or:
 sudo bash /opt/dalihub/uninstall.sh
 ```
 
-## UART Configuration by Pi Model
+## UART Configuration
 
-The installer automatically applies the correct settings based on the detected Pi model.
+The installer automatically applies the following settings:
 
-| | Pi 4 and earlier | Pi 5 |
-|---|---|---|
-| **config.txt** | `enable_uart=1` | `dtparam=uart0=on` |
-| | `dtoverlay=disable-bt` | (not needed) |
-| **Services stopped** | `hciuart` | (not needed) |
-| | `bluetooth` | (not needed) |
-| | `serial-getty@ttyAMA0` | `serial-getty@ttyAMA0` |
-| | `serial-getty@ttyS0` | `serial-getty@ttyS0` |
-| **cmdline.txt** | Remove `console=` serial entries | Remove `console=` serial entries |
+| Setting | Value |
+|---|---|
+| **config.txt** | `enable_uart=1` |
+| | `dtoverlay=disable-bt` |
+| **Services stopped** | `hciuart`, `bluetooth` |
+| | `serial-getty@ttyAMA0`, `serial-getty@ttyS0` |
+| **cmdline.txt** | Remove `console=` serial entries |
 
 ## Troubleshooting
 
