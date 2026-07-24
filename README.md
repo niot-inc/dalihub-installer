@@ -202,6 +202,8 @@ The installer automatically applies the following settings:
 | | `serial-getty@ttyAMA0`, `serial-getty@ttyS0` |
 | **cmdline.txt** | Remove `console=` serial entries |
 
+> If you force installation on an unsupported Pi 5, `dtparam=uart0=on` is applied instead of the config.txt settings above (Bluetooth does not need to be disabled on Pi 5).
+
 ## Troubleshooting
 
 ### Serial Port Not Connected
