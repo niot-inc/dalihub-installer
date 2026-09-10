@@ -16,7 +16,7 @@ curl -sSL https://raw.githubusercontent.com/niot-inc/dalihub-installer/main/inst
 - **OS**: Raspberry Pi OS (64-bit recommended), Debian 11+, Ubuntu 22.04+
 - **Network**: Internet connection (during installation)
 
-> **WARNING: Raspberry Pi 5 is NOT supported.** The DALI HAT freezes when attached to a Pi 5 due to hardware compatibility issues. Even when UART is correctly configured and loopback tests pass, the HAT becomes unresponsive upon attachment. **Use Raspberry Pi 4.**
+> **NOTE: Raspberry Pi 5 requires HAT firmware v15 or later.** When ordering the DALI HAT, **request firmware version 15** — it works on a Pi 5 without any modification. HATs with older firmware freeze when attached to a Pi 5 (the co-processor does not start up); use those boards with a **Raspberry Pi 4**, or contact ATX LED about the hardware workaround for already-shipped boards.
 
 > **WARNING: Use the correct power supply!** Many issues (random reboots, serial communication failures, HAT malfunction) are caused by insufficient power.
 > - **Raspberry Pi 4**: 5.1V / 3A (USB-C) — official power supply recommended

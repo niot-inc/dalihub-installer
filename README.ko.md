@@ -16,7 +16,7 @@ curl -sSL https://raw.githubusercontent.com/niot-inc/dalihub-installer/main/inst
 - **OS**: Raspberry Pi OS (64-bit 권장), Debian 11+, Ubuntu 22.04+
 - **네트워크**: 인터넷 연결 (설치 시)
 
-> **경고: Raspberry Pi 5는 지원하지 않습니다.** DALI HAT을 Pi 5에 장착하면 하드웨어 호환성 문제로 HAT이 프리징됩니다. UART 설정이 올바르고 루프백 테스트를 통과하더라도 HAT 장착 시 응답 불가 상태가 됩니다. **반드시 Raspberry Pi 4를 사용하세요.**
+> **참고: Raspberry Pi 5는 HAT 펌웨어 v15 이상이 필요합니다.** DALI HAT 주문 시 **firmware version 15를 요청**하면 Pi 5에서 아무 수정 없이 동작합니다. 이전 펌웨어의 HAT은 Pi 5에 장착하면 co-processor가 기동하지 않아 프리징됩니다. 이 경우 **Raspberry Pi 4**를 사용하거나, 기출고 보드용 하드웨어 해결책은 ATX LED에 문의하세요.
 
 > **경고: 반드시 정격 전원 어댑터를 사용하세요!** 전원 공급 불량은 무작위 재부팅, 시리얼 통신 실패, HAT 오작동 등 대부분의 문제의 원인입니다.
 > - **Raspberry Pi 4**: 5.1V / 3A (USB-C) — 공식 전원 어댑터 권장
