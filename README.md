@@ -12,7 +12,7 @@ curl -sSL https://raw.githubusercontent.com/niot-inc/dalihub-installer/main/inst
 
 ## Requirements
 
-- **Hardware**: Raspberry Pi 4 + DALI HAT
+- **Hardware**: Raspberry Pi 4 + DALI HAT — [ATX LED Raspberry Pi to DALI Co-Processor HAT](https://atx-led.com/products/atx-led%C2%AE-raspberry-pi-to-dali-co-processor) (1/2/4-channel)
 - **OS**: Raspberry Pi OS (64-bit recommended), Debian 11+, Ubuntu 22.04+
 - **Network**: Internet connection (during installation)
 

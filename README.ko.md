@@ -12,7 +12,7 @@ curl -sSL https://raw.githubusercontent.com/niot-inc/dalihub-installer/main/inst
 
 ## 요구사항
 
-- **하드웨어**: Raspberry Pi 4 + DALI HAT
+- **하드웨어**: Raspberry Pi 4 + DALI HAT — [ATX LED Raspberry Pi to DALI Co-Processor HAT](https://atx-led.com/products/atx-led%C2%AE-raspberry-pi-to-dali-co-processor) (1/2/4채널)
 - **OS**: Raspberry Pi OS (64-bit 권장), Debian 11+, Ubuntu 22.04+
 - **네트워크**: 인터넷 연결 (설치 시)
 
