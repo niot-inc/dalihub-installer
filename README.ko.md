@@ -202,7 +202,7 @@ sudo bash /opt/dalihub/uninstall.sh
 | | `serial-getty@ttyAMA0`, `serial-getty@ttyS0` |
 | **cmdline.txt** | `console=` 시리얼 항목 제거 |
 
-> 미지원 기종인 Pi 5에서 강행 설치하는 경우, 위 config.txt 설정 대신 `dtparam=uart0=on`이 적용됩니다. (Pi 5는 Bluetooth 비활성화가 필요 없습니다.)
+> Raspberry Pi 5에서는 위 config.txt 설정 대신 `dtparam=uart0=on`이 적용됩니다. (Pi 5는 Bluetooth 비활성화가 필요 없습니다.)
 
 ## 문제 해결
 
